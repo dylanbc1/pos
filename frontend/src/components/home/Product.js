@@ -25,7 +25,7 @@ function Product({ product, incrementCartCount }) {
   }, [user]);
 
   const handleAddToCart = () => {
-    updateCheckout(product); // anadimos product al carrito
+    updateCheckout(product, 1); // anadimos product al carrito
     incrementCartCount();
   };
 
