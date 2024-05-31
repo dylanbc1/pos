@@ -1,14 +1,16 @@
 import React from "react";
 import { Link } from 'react-router-dom';
-
+import { useUser } from "../../UserContext.js";
 
 function NavBar({ }) {
+
+  const user = useUser();
   return (
     <nav className="bg-gray-800">
       <div className="container flex">
         <div className="px-8 py-4 bg-primary md:flex items-center cursor-pointer relative group hidden">
           
-        <Link to="/products" className="text-gray-200 font-bold hover:text-white transition" > 
+        <Link to="/" className="text-gray-200 font-bold hover:text-white transition" > 
 
           
             Home
@@ -21,7 +23,8 @@ function NavBar({ }) {
           <Link to="/login"
             className="text-gray-200 hover:text-white transition"
           >
-            Login
+            { user ?  "Logout" : "Login" }
+            
           </Link>
         </div>
       </div>
