@@ -1,7 +1,11 @@
 import React from "react";  
 import { useCheckout, useCheckoutUpdate} from '../../CheckoutContext.js';
+import config from "../../config.json";
 
-function Receipt() {
+// substractCar -> func que viene de checkout
+// para restarle cantidad al carrito cada vez
+// que quite un producto
+function Receipt({ substractCart }) {
     const updateCheckout = useCheckoutUpdate(); // funcion updateCheckout
 
     // costo de envio
@@ -39,7 +43,34 @@ function Receipt() {
     
     const handleDeleteClick = (id) => {
         updateCheckout(id, 0);
+        substractCart();
     }
+
+    const handlePlaceOrderClick = async () => {
+        for (const product of checkout) {
+            const updatedProduct = { ...product, stock: product.stock - 1 };
+
+            try {
+                const response = await fetch(config["app.api"] + "/products/" + product.id, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(updatedProduct),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al actualizar el producto');
+                }
+
+                // Si la actualización es exitosa, actualiza localmente el checkout
+                substractCart();
+                updateCheckout(product.id, updatedProduct.stock);
+            } catch (error) {
+                console.error('Error al actualizar el producto:', error);
+            }
+        }
+    };
 
     return (
         <div className="col-span-4 border border-gray-200 p-4 rounded">
@@ -83,8 +114,8 @@ function Receipt() {
                 <label htmlFor="aggrement" className="text-gray-600 ml-3 cursor-pointer text-sm">I agree to the <a href="#"
                         className="text-primary">terms & conditions</a></label>
             </div>
-
-            <a href="#"
+            
+            <a onClick={() => handlePlaceOrderClick()} href="#"
                 className="block w-full py-3 px-4 text-center text-white bg-primary border border-primary rounded-md hover:bg-transparent hover:text-primary transition font-medium">Place
                 order</a>
         </div>
